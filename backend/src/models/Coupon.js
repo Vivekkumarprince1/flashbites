@@ -4,7 +4,6 @@ const couponSchema = new mongoose.Schema({
   code: {
     type: String,
     required: true,
-    unique: true,
     uppercase: true,
     trim: true
   },
@@ -73,7 +72,7 @@ const couponSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-couponSchema.index({ code: 1 });
+couponSchema.index({ code: 1 }, { unique: true });
 couponSchema.index({ validFrom: 1, validTill: 1 });
 couponSchema.index({ isActive: 1, validTill: 1 });
 
