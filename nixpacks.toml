@@ -1,11 +1,13 @@
 [phases.setup]
 nixPkgs = ['nodejs_18']
+nixOverlays = []
+nixLibs = []
 
 [phases.install]
-cmds = ['cd backend && npm ci']
+cmds = ['cd backend && npm ci --production']
 
 [phases.build]
 cmds = ['echo "No build step needed"']
 
 [start]
-cmd = 'node backend/server.js'
+cmd = 'cd backend && node server.js'
