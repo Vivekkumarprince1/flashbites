@@ -30,6 +30,7 @@ import About from './pages/About';
 import Partner from './pages/Partner';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
+import NotificationsPage from './pages/NotificationsPage';
 import NotFound from './pages/NotFound';
 
 // Google OAuth Success Handler
@@ -123,6 +124,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <NotificationsPage />
                   </ProtectedRoute>
                 }
               />

@@ -10,6 +10,7 @@ import { logout } from '../../redux/slices/authSlice';
 import { toggleCart } from '../../redux/slices/uiSlice';
 import toast from 'react-hot-toast';
 import logo from '../../assets/logo.png';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -64,6 +65,9 @@ const Navbar = () => {
                     Admin Panel
                   </Link>
                 )}
+
+                {/* Notification Bell */}
+                {isAuthenticated && <NotificationBell />}
 
                 {/* Cart */}
                 <button
