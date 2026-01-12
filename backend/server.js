@@ -18,6 +18,9 @@ const passport = require('./src/config/passport');
 // Import database connection
 const connectDB = require('./src/config/database');
 
+// Import socket service
+const { initializeSocket } = require('./src/services/socketService');
+
 // Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
@@ -172,6 +175,9 @@ const server = app.listen(PORT, () => {
   ║   Time: ${new Date().toLocaleString()}   ║
   ╚═══════════════════════════════════════════╝
   `);
+  
+  // Initialize Socket.IO after server starts
+  initializeSocket(server);
 });
 
 // Handle unhandled promise rejections

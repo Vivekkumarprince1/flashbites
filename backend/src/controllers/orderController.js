@@ -3,6 +3,7 @@ const Restaurant = require('../models/Restaurant');
 const MenuItem = require('../models/MenuItem');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { notifyOrderStatus } = require('../utils/notificationService');
+const { notifyRestaurantNewOrder, notifyAdminNewOrder, notifyUserOrderUpdate } = require('../services/socketService');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -165,11 +166,24 @@ exports.createOrder = async (req, res) => {
     }
     await order.save();
 
-    // Send notification to restaurant owner
+    // Populate order details for notifications
+    const populatedOrder = await Order.findById(order._id)
+      .populate('user', 'name email phone')
+      .populate('restaurant', 'name phone address')
+      .populate('items.menuItem', 'name price');
+
+    // Send real-time notifications with sound
     try {
       console.log(`📧 Notification: New order ${order._id} for restaurant ${restaurant.name}`);
       console.log(`📧 Order details: ${orderItems.length} items, Total: ${total}`);
       console.log(`💳 Payment method: ${paymentMethod}`);
+      
+      // Notify restaurant owner
+      notifyRestaurantNewOrder(restaurantId, populatedOrder);
+      
+      // Notify all admins
+      notifyAdminNewOrder(populatedOrder);
+      
       if (paymentMethod !== 'cod') {
         console.log(`⚠️ WARNING: Online payment not confirmed yet!`);
       }
@@ -177,7 +191,7 @@ exports.createOrder = async (req, res) => {
       console.error('Failed to send notification:', notifyError);
     }
 
-    successResponse(res, 201, 'Order created successfully', { order });
+    successResponse(res, 201, 'Order created successfully', { order: populatedOrder });
   } catch (error) {
     console.error('CREATE ORDER ERROR:', error);
     errorResponse(res, 500, 'Failed to create order', error.message);
@@ -283,6 +297,12 @@ exports.updateOrderStatus = async (req, res) => {
 
     await order.save();
 
+    // Populate order details for notifications
+    const populatedOrder = await Order.findById(order._id)
+      .populate('user', 'name email phone')
+      .populate('restaurant', 'name phone address')
+      .populate('items.menuItem', 'name price');
+
     // Send notification for status update
     const statusMap = {
       confirmed: 'confirmed',
@@ -295,9 +315,12 @@ exports.updateOrderStatus = async (req, res) => {
     
     if (statusMap[status]) {
       await notifyOrderStatus(order, statusMap[status]);
+      
+      // Send real-time notification to user with sound
+      notifyUserOrderUpdate(order.user._id || order.user, populatedOrder);
     }
 
-    successResponse(res, 200, 'Order status updated successfully', { order });
+    successResponse(res, 200, 'Order status updated successfully', { order: populatedOrder });
   } catch (error) {
     errorResponse(res, 500, 'Failed to update order status', error.message);
   }

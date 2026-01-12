@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { useDispatch, useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { getCurrentUser } from './redux/slices/authSlice';
+import { useNotifications } from './hooks/useNotifications';
 
 // Layout Components
 import Navbar from './components/common/Navbar';
@@ -60,6 +61,9 @@ const GoogleAuthSuccess = () => {
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
+  
+  // Initialize notification system
+  useNotifications();
 
   useEffect(() => {
     if (isAuthenticated) {
