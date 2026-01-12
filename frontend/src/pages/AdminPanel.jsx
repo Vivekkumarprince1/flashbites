@@ -17,6 +17,8 @@ import { getAllPartnerApplications, approvePartner, rejectPartner } from '../api
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '../utils/constants';
 import axios from '../api/axios';
+import socketService from '../services/socketService';
+import { playNotificationSound } from '../utils/notificationSound';
 
 const AdminPanel = () => {
   const { user } = useSelector((state) => state.auth);
@@ -53,6 +55,35 @@ const AdminPanel = () => {
     
     return () => clearInterval(interval);
   }, [user, navigate]);
+
+  // Socket.IO listener for new orders (admin receives all new orders)
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+
+    const handleNewOrder = (data) => {
+      console.log('🔔 Admin: New order received:', data);
+      
+      // Play notification sound
+      playNotificationSound('new-order');
+      
+      // Show toast notification
+      toast.success(`🔔 New Order! Restaurant: ${data.order.restaurantId?.name || 'Unknown'}, Total: ${formatCurrency(data.order.total)}`, {
+        duration: 5000,
+        icon: '🛎️'
+      });
+      
+      // Refresh data if on orders tab
+      if (activeTab === 'orders') {
+        fetchData();
+      }
+    };
+
+    socketService.onNewOrder(handleNewOrder);
+
+    return () => {
+      socketService.off('new-order');
+    };
+  }, [user, activeTab]);
 
   // Recalculate stats when data changes
   useEffect(() => {
