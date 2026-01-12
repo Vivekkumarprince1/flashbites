@@ -340,8 +340,20 @@ exports.updateOrderStatus = async (req, res) => {
         
         // Send real-time notification to user with sound
         if (populatedOrder.userId) {
-          notifyUserOrderUpdate(populatedOrder.userId.toString(), populatedOrder);
-          console.log('✓ [updateOrderStatus] Socket notification sent to user');
+          const userIdStr = populatedOrder.userId._id ? populatedOrder.userId._id.toString() : populatedOrder.userId.toString();
+          notifyUserOrderUpdate(userIdStr, populatedOrder);
+          console.log('✓ [updateOrderStatus] Socket notification sent to user:', userIdStr);
+        }
+        
+        // Also notify restaurant about the status change
+        if (populatedOrder.restaurantId && ['confirmed', 'ready', 'delivered', 'cancelled'].includes(status)) {
+          const restaurantIdStr = populatedOrder.restaurantId._id ? populatedOrder.restaurantId._id.toString() : populatedOrder.restaurantId.toString();
+          notifyRestaurantNewOrder(restaurantIdStr, {
+            ...populatedOrder.toObject(),
+            message: `Order #${populatedOrder._id.toString().slice(-8)} status: ${status}`,
+            type: 'ORDER_STATUS_UPDATE'
+          });
+          console.log('✓ [updateOrderStatus] Restaurant notified of status change');
         }
       } catch (notifError) {
         console.error('⚠️ [updateOrderStatus] Notification error (non-fatal):', notifError.message);
@@ -384,7 +396,45 @@ exports.cancelOrder = async (req, res) => {
     order.cancellationReason = req.body.reason || 'Cancelled by user';
     await order.save();
 
-    successResponse(res, 200, 'Order cancelled successfully', { order });
+    // Populate order for notifications
+    const populatedOrder = await Order.findById(order._id)
+      .populate('userId', 'name email phone')
+      .populate({
+        path: 'restaurantId',
+        select: 'name phone address ownerId',
+        populate: { path: 'ownerId', select: '_id name email' }
+      })
+      .populate('items.menuItemId', 'name price');
+
+    // Send notifications
+    try {
+      console.log('✓ [cancelOrder] Sending cancellation notifications...');
+      
+      // Notify via email service
+      await notifyOrderStatus(populatedOrder, 'cancelled');
+      
+      // Send real-time notification to user
+      if (populatedOrder.userId) {
+        const userIdStr = populatedOrder.userId._id ? populatedOrder.userId._id.toString() : populatedOrder.userId.toString();
+        notifyUserOrderUpdate(userIdStr, populatedOrder);
+        console.log('✓ [cancelOrder] User notified');
+      }
+      
+      // Notify restaurant about cancellation
+      if (populatedOrder.restaurantId) {
+        const restaurantIdStr = populatedOrder.restaurantId._id ? populatedOrder.restaurantId._id.toString() : populatedOrder.restaurantId.toString();
+        notifyRestaurantNewOrder(restaurantIdStr, {
+          ...populatedOrder.toObject(),
+          message: `Order #${populatedOrder._id.toString().slice(-8)} was cancelled by customer`,
+          type: 'ORDER_CANCELLED'
+        });
+        console.log('✓ [cancelOrder] Restaurant notified');
+      }
+    } catch (notifError) {
+      console.error('⚠️ [cancelOrder] Notification error (non-fatal):', notifError.message);
+    }
+
+    successResponse(res, 200, 'Order cancelled successfully', { order: populatedOrder });
   } catch (error) {
     errorResponse(res, 500, 'Failed to cancel order', error.message);
   }

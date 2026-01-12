@@ -27,6 +27,8 @@ import {
 import { getRestaurantOrders, updateOrderStatus } from '../api/orderApi';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '../utils/constants';
+import socketService from '../services/socketService';
+import { playNotificationSound } from '../utils/notificationSound';
 
 const RestaurantDashboard = () => {
   const { user } = useSelector((state) => state.auth);
@@ -105,6 +107,10 @@ const RestaurantDashboard = () => {
       if (response.data.restaurant) {
         setRestaurant(response.data.restaurant);
         await fetchMenuItems(response.data.restaurant._id);
+        
+        // Join restaurant room for real-time notifications
+        socketService.joinRestaurant(response.data.restaurant._id);
+        console.log('🏪 Joined restaurant room:', response.data.restaurant._id);
       }
     } catch (error) {
       if (error.response?.status === 404) {
@@ -117,6 +123,47 @@ const RestaurantDashboard = () => {
       setLoading(false);
     }
   };
+
+  // Socket.IO event listeners for real-time notifications
+  useEffect(() => {
+    if (!restaurant) return;
+
+    // Listen for new orders
+    const handleNewOrder = (data) => {
+      console.log('🔔 New order received:', data);
+      
+      // Play notification sound
+      playNotificationSound('new-order');
+      
+      // Show toast notification
+      if (data.type === 'NEW_ORDER') {
+        toast.success(`🔔 New Order! Total: ${formatCurrency(data.order.total)}`, {
+          duration: 5000,
+          icon: '🛎️'
+        });
+      } else if (data.type === 'ORDER_CANCELLED') {
+        toast.error(data.message || 'Order was cancelled', {
+          duration: 5000
+        });
+      } else if (data.type === 'ORDER_STATUS_UPDATE') {
+        toast.info(data.message || 'Order status updated', {
+          duration: 4000
+        });
+      }
+      
+      // Refresh orders list
+      if (activeTab === 'orders') {
+        fetchOrders();
+      }
+    };
+
+    socketService.onNewOrder(handleNewOrder);
+
+    // Cleanup
+    return () => {
+      socketService.off('new-order');
+    };
+  }, [restaurant, activeTab]);
 
   const fetchMenuItems = async (restaurantId) => {
     try {
