@@ -44,6 +44,7 @@ const RestaurantDashboard = () => {
   const [analyticsPeriod, setAnalyticsPeriod] = useState('30');
   const [loading, setLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [autoRefreshOrders, setAutoRefreshOrders] = useState(false);
   const [showRestaurantForm, setShowRestaurantForm] = useState(false);
   const [showMenuForm, setShowMenuForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -167,6 +168,18 @@ const RestaurantDashboard = () => {
       socketService.off('new-order');
     };
   }, [restaurant, activeTab]);
+
+  // Auto-refresh orders when enabled
+  useEffect(() => {
+    if (!autoRefreshOrders || activeTab !== 'orders' || !restaurant) return;
+
+    const intervalId = setInterval(() => {
+      console.log('Auto-refreshing orders...');
+      fetchOrders();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [autoRefreshOrders, activeTab, restaurant]);
 
   const fetchMenuItems = async (restaurantId) => {
     try {
@@ -795,15 +808,29 @@ const RestaurantDashboard = () => {
 
             {activeTab === 'orders' && (
               <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
                   <h2 className="text-xl font-bold">Restaurant Orders</h2>
-                  <button
-                    onClick={fetchOrders}
-                    className="btn-outline"
-                    disabled={ordersLoading}
-                  >
-                    {ordersLoading ? 'Loading...' : 'Refresh'}
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {/* Auto-refresh toggle */}
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoRefreshOrders}
+                        onChange={(e) => setAutoRefreshOrders(e.target.checked)}
+                        className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        Auto-refresh {autoRefreshOrders && '(30s)'}
+                      </span>
+                    </label>
+                    <button
+                      onClick={fetchOrders}
+                      className="btn-outline"
+                      disabled={ordersLoading}
+                    >
+                      {ordersLoading ? 'Loading...' : 'Refresh'}
+                    </button>
+                  </div>
                 </div>
 
                 {ordersLoading ? (
