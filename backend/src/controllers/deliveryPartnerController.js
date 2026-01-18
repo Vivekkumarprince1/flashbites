@@ -29,7 +29,7 @@ exports.getAvailableOrders = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(50);
 
-    return successResponse(res, { orders, count: orders.length }, 'Available orders fetched successfully');
+    return successResponse(res, 200, 'Available orders fetched successfully', { orders, count: orders.length });
   } catch (error) {
     console.error('Get available orders error:', error);
     return errorResponse(res, 500, 'Failed to fetch available orders');
@@ -50,7 +50,7 @@ exports.getAssignedOrders = async (req, res) => {
       .populate('addressId')
       .sort({ createdAt: -1 });
 
-    return successResponse(res, { orders, count: orders.length }, 'Assigned orders fetched successfully');
+    return successResponse(res, 200, 'Assigned orders fetched successfully', { orders, count: orders.length });
   } catch (error) {
     console.error('Get assigned orders error:', error);
     return errorResponse(res, 500, 'Failed to fetch assigned orders');
@@ -107,7 +107,7 @@ exports.acceptOrder = async (req, res) => {
       console.error('Failed to send delivery assignment notification:', notifyError);
     }
 
-    return successResponse(res, { order: updatedOrder }, 'Order accepted successfully');
+    return successResponse(res, 200, 'Order accepted successfully', { order: updatedOrder });
   } catch (error) {
     console.error('Accept order error:', error);
     return errorResponse(res, 500, 'Failed to accept order');
@@ -147,7 +147,7 @@ exports.markAsDelivered = async (req, res) => {
       .populate('restaurantId', 'name address phone location')
       .populate('addressId');
 
-    return successResponse(res, { order: updatedOrder }, 'Order marked as delivered successfully');
+    return successResponse(res, 200, 'Order marked as delivered successfully', { order: updatedOrder });
   } catch (error) {
     console.error('Mark as delivered error:', error);
     return errorResponse(res, 500, 'Failed to mark order as delivered');
@@ -177,12 +177,12 @@ exports.getOrderHistory = async (req, res) => {
       status: 'delivered'
     });
 
-    return successResponse(res, {
+    return successResponse(res, 200, 'Order history fetched successfully', {
       orders,
       totalPages: Math.ceil(count / limit),
       currentPage: page,
       totalOrders: count
-    }, 'Order history fetched successfully');
+    });
   } catch (error) {
     console.error('Get order history error:', error);
     return errorResponse(res, 500, 'Failed to fetch order history');
@@ -216,12 +216,12 @@ exports.getStats = async (req, res) => {
 
     const earnings = totalEarnings.length > 0 ? totalEarnings[0].total : 0;
 
-    return successResponse(res, {
+    return successResponse(res, 200, 'Stats fetched successfully', {
       totalDeliveries,
       todayDeliveries,
       activeOrders,
       totalEarnings: earnings
-    }, 'Stats fetched successfully');
+    });
   } catch (error) {
     console.error('Get stats error:', error);
     return errorResponse(res, 500, 'Failed to fetch stats');
@@ -287,7 +287,7 @@ exports.updateLocation = async (req, res) => {
       }
     }
 
-    return successResponse(res, { latitude, longitude }, 'Location updated successfully');
+    return successResponse(res, 200, 'Location updated successfully', { latitude, longitude });
   } catch (error) {
     console.error('Update location error:', error);
     return errorResponse(res, 500, 'Failed to update location');
