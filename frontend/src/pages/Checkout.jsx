@@ -262,17 +262,17 @@ const Checkout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Checkout</h1>
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="md:col-span-2 space-y-6">
             {/* Delivery Address */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Delivery Address</h2>
+                <h2 className="text-lg sm:text-xl font-bold">Delivery Address</h2>
                 <button
                   onClick={() => setShowAddAddressModal(true)}
                   className="text-orange-600 hover:text-orange-700 font-semibold text-sm"
@@ -321,8 +321,8 @@ const Checkout = () => {
             </div>
 
             {/* Apply Coupon */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Apply Coupon</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold mb-4">Apply Coupon</h2>
               
               {appliedCoupon ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -346,7 +346,7 @@ const Checkout = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={couponCode}
@@ -357,7 +357,7 @@ const Checkout = () => {
                   <button
                     onClick={handleApplyCoupon}
                     disabled={couponLoading || !couponCode.trim()}
-                    className="btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-primary px-6 py-2.5 sm:py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {couponLoading ? 'Applying...' : 'Apply'}
                   </button>
@@ -366,8 +366,8 @@ const Checkout = () => {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Payment Method</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold mb-4">Payment Method</h2>
               
               <div className="space-y-3">
                 {/* Card Payment */}
@@ -479,8 +479,8 @@ const Checkout = () => {
 
           {/* Right Column - Order Summary */}
           <div>
-            <div className="bg-white rounded-lg shadow p-6 sticky top-24">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6 sticky top-20 md:top-24">
+              <h2 className="text-lg sm:text-xl font-bold mb-4">Order Summary</h2>
 
               <div className="space-y-3 mb-4">
                 {items.map((item) => (
@@ -520,18 +520,6 @@ const Checkout = () => {
                   <span className="text-primary-600">{formatCurrency(total)}</span>
                 </div>
               </div>
-
-              {/* Minimum Order Warning */}
-              {subtotal < MINIMUM_ORDER_VALUE && (
-                <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                  <p className="text-sm text-red-800 font-medium">
-                    ⚠️ Minimum order value is {formatCurrency(MINIMUM_ORDER_VALUE)}
-                  </p>
-                  <p className="text-xs text-red-600 mt-1">
-                    Add {formatCurrency(MINIMUM_ORDER_VALUE - subtotal)} more to place order
-                  </p>
-                </div>
-              )}
 
               {/* Minimum Order Warning */}
               {subtotal < MINIMUM_ORDER_VALUE && (

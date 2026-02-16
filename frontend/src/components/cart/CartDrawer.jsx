@@ -48,85 +48,89 @@ const CartDrawer = () => {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-30 sm:z-40"
+        className="fixed inset-0 bg-black/50 z-40 animate-fade-in"
         onClick={() => dispatch(toggleCart())}
       />
 
-      {/* Drawer - Full screen on mobile (above nav), side drawer on desktop */}
-      <div className="fixed top-0 left-0 right-0 bottom-20 sm:inset-0 sm:right-0 sm:top-0 sm:h-full sm:bottom-auto sm:w-96 bg-white z-40 sm:z-50 shadow-xl flex flex-col">
-        {/* Header - Hidden on mobile, visible on desktop */}
-        <div className="hidden sm:flex p-4 sm:p-4 border-b sticky top-0 bg-white items-center justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-bold truncate">Your Cart</h2>
+      {/* Drawer – full-screen on mobile, right-side panel on sm+ */}
+      <div className="fixed inset-0 z-50 sm:left-auto sm:w-[420px] bg-white shadow-2xl flex flex-col animate-slide-up sm:animate-slide-right">
+        {/* Header – always visible on all sizes */}
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b bg-white sticky top-0 z-10">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold truncate">Your Cart</h2>
             {restaurant && (
-              <p className="text-xs sm:text-sm text-gray-600 truncate">{restaurant.name}</p>
+              <p className="text-xs text-gray-500 truncate">from {restaurant.name}</p>
             )}
           </div>
           <button
             onClick={() => dispatch(toggleCart())}
-            className="p-2 hover:bg-gray-100 rounded-full flex-shrink-0"
+            className="p-2 -mr-1 hover:bg-gray-100 rounded-full flex-shrink-0 touch-feedback"
             aria-label="Close cart"
           >
-            <XMarkIcon className="h-6 w-6 sm:h-5 sm:w-5" />
+            <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
 
-        {/* Cart Items - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+        {/* Cart Items – Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4">
           {items.length === 0 ? (
-            <div className="text-center py-16 sm:py-12 flex flex-col items-center justify-center h-full">
-              <div className="text-5xl sm:text-6xl mb-4">🛒</div>
-              <p className="text-gray-600 text-base sm:text-sm">Your cart is empty</p>
+            <div className="flex flex-col items-center justify-center h-full text-center py-16">
+              <div className="text-6xl mb-4">🛒</div>
+              <p className="text-gray-500 text-sm">Your cart is empty</p>
+              <button
+                onClick={() => dispatch(toggleCart())}
+                className="mt-4 text-primary-600 font-medium text-sm touch-feedback"
+              >
+                Browse Restaurants →
+              </button>
             </div>
           ) : (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-3">
               {items.map((item) => (
                 <div 
                   key={item._id} 
-                  className="flex gap-3 p-3 border rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                  className="flex gap-3 p-3 border rounded-xl bg-white hover:bg-gray-50/60 transition-colors"
                 >
-                  {/* Item Image - Larger on mobile */}
+                  {/* Item Image */}
                   {item.image && (
-                    <div className="flex-shrink-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 sm:w-16 sm:h-16 object-cover rounded"
-                      />
-                    </div>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-[72px] h-[72px] object-cover rounded-lg flex-shrink-0"
+                    />
                   )}
 
                   {/* Item Details */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                    <h4 className="font-semibold text-gray-900 text-sm truncate">
                       {item.name}
                     </h4>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                      {formatCurrency(item.price)}
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {formatCurrency(item.price)} each
                     </p>
-                    <p className="text-xs sm:text-xs text-primary-600 font-semibold mt-1">
-                      Subtotal: {formatCurrency(item.price * item.quantity)}
+                    <p className="text-xs text-primary-600 font-semibold mt-0.5">
+                      {formatCurrency(item.price * item.quantity)}
                     </p>
 
-                    {/* Quantity Controls - Larger on mobile for easier touch */}
+                    {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => dispatch(updateQuantity({ 
                           itemId: item._id, 
                           quantity: item.quantity - 1 
                         }))}
-                        className="w-9 h-9 sm:w-8 sm:h-8 border-2 border-primary-600 text-primary-600 rounded-lg flex items-center justify-center hover:bg-primary-50 active:bg-primary-100 transition-colors"
+                        className="w-8 h-8 border-2 border-primary-600 text-primary-600 rounded-lg flex items-center justify-center touch-feedback"
                         aria-label="Decrease quantity"
                       >
                         <MinusIcon className="h-4 w-4" />
                       </button>
-                      <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+                      <span className="w-6 text-center font-bold text-sm tabular-nums">{item.quantity}</span>
                       <button
                         onClick={() => dispatch(updateQuantity({ 
                           itemId: item._id, 
                           quantity: item.quantity + 1 
                         }))}
-                        className="w-9 h-9 sm:w-8 sm:h-8 border-2 border-primary-600 text-primary-600 rounded-lg flex items-center justify-center hover:bg-primary-50 active:bg-primary-100 transition-colors"
+                        className="w-8 h-8 border-2 border-primary-600 text-primary-600 rounded-lg flex items-center justify-center touch-feedback"
                         aria-label="Increase quantity"
                       >
                         <PlusIcon className="h-4 w-4" />
@@ -135,10 +139,10 @@ const CartDrawer = () => {
                       {/* Remove Button */}
                       <button
                         onClick={() => dispatch(removeFromCart(item._id))}
-                        className="ml-auto p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                        className="ml-auto p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg touch-feedback"
                         aria-label="Remove item"
                       >
-                        <TrashIcon className="h-5 w-5" />
+                        <TrashIcon className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -160,33 +164,33 @@ const CartDrawer = () => {
           )}
         </div>
 
-        {/* Footer - Bill Summary - Sticky on mobile */}
+        {/* Footer – Bill Summary */}
         {items.length > 0 && (
-          <div className="border-t p-3 sm:p-4 space-y-3 sm:space-y-3 sticky bottom-0 bg-white">
+          <div className="border-t p-4 space-y-3 bg-white" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
             {/* Price Breakdown */}
-            <div className="space-y-2 text-xs sm:text-sm bg-gray-50 rounded-lg p-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">{formatCurrency(subtotal)}</span>
+            <div className="space-y-1.5 text-sm bg-gray-50 rounded-xl p-3">
+              <div className="flex justify-between text-gray-500">
+                <span>Subtotal</span>
+                <span className="font-medium text-gray-700">{formatCurrency(subtotal)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Delivery</span>
-                <span className="font-semibold">{formatCurrency(deliveryFee)}</span>
+              <div className="flex justify-between text-gray-500">
+                <span>Delivery</span>
+                <span className="font-medium text-gray-700">{formatCurrency(deliveryFee)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tax (5%)</span>
-                <span className="font-semibold">{formatCurrency(tax)}</span>
+              <div className="flex justify-between text-gray-500">
+                <span>Tax (5%)</span>
+                <span className="font-medium text-gray-700">{formatCurrency(tax)}</span>
               </div>
-              <div className="flex justify-between text-base sm:text-lg font-bold pt-2 border-t border-gray-200">
+              <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
                 <span>Total</span>
                 <span className="text-primary-600">{formatCurrency(total)}</span>
               </div>
             </div>
 
-            {/* Checkout Button - Large on mobile */}
+            {/* Checkout Button */}
             <button
               onClick={handleCheckout}
-              className="w-full btn-primary py-3 sm:py-3 text-base sm:text-base font-semibold rounded-lg active:scale-95 transition-transform"
+              className="w-full btn-primary py-3.5 text-base font-semibold rounded-xl touch-feedback"
             >
               Proceed to Checkout
             </button>
@@ -194,7 +198,7 @@ const CartDrawer = () => {
             {/* Continue Shopping */}
             <button
               onClick={() => dispatch(toggleCart())}
-              className="w-full py-2 px-4 text-primary-600 border border-primary-600 hover:bg-primary-50 text-sm sm:text-sm font-medium rounded-lg transition-colors"
+              className="w-full py-2 text-primary-600 text-sm font-medium touch-feedback"
             >
               Continue Shopping
             </button>

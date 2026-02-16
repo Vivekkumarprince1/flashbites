@@ -14,7 +14,7 @@ const MenuCard = ({ item, restaurant }) => {
   };
 
   return (
-    <div className="card p-4 flex">
+    <div className="card p-4 flex flex-col sm:flex-row">
       {/* Item Info */}
       <div className="flex-1">
         {/* Veg/Non-veg Indicator */}
@@ -30,7 +30,7 @@ const MenuCard = ({ item, restaurant }) => {
           )}
         </div>
 
-        <h3 className="text-lg font-bold text-gray-900 mb-1">{item.name}</h3>
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">{item.name}</h3>
         <p className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</p>
         
         {/* Tags */}
@@ -44,7 +44,7 @@ const MenuCard = ({ item, restaurant }) => {
           </div>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <span className="text-lg font-bold text-primary-600">
             {formatCurrency(item.price)}
           </span>
@@ -67,11 +67,11 @@ const MenuCard = ({ item, restaurant }) => {
 
       {/* Item Image */}
       {item.image && (
-        <div className="ml-4">
+        <div className="mt-3 sm:mt-0 sm:ml-4 self-end sm:self-auto">
           <img
             src={item.image}
             alt={item.name}
-            className="w-24 h-24 object-cover rounded-lg"
+            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
           />
         </div>
       )}
