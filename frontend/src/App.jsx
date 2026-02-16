@@ -115,7 +115,7 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <Navbar />
           
-          <main className="flex-1 pb-20 md:pb-0">
+          <main className="flex-1 pb-[calc(86px+var(--safe-area-inset-bottom))] md:pb-0">
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
@@ -207,12 +207,15 @@ function App() {
 
         {/* Toast Notifications */}
         <Toaster
-          position="top-right"
+          position="top-center"
+          containerStyle={{ top: 16 }}
           toastOptions={{
             duration: 3000,
             style: {
               background: '#363636',
               color: '#fff',
+              maxWidth: '90vw',
+              fontSize: '14px',
             },
             success: {
               duration: 3000,

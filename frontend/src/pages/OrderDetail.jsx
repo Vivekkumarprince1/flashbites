@@ -123,7 +123,7 @@ const OrderDetail = () => {
   const isDelivered = order.status === 'delivered';
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="mb-6">
@@ -133,13 +133,13 @@ const OrderDetail = () => {
           >
             ← Back to Orders
           </button>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Order Details</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Order Details</h1>
               <p className="text-gray-600">Order #{order._id.slice(-8).toUpperCase()}</p>
               <p className="text-sm text-gray-500">{formatDateTime(order.createdAt)}</p>
             </div>
-            <span className={`badge text-lg px-4 py-2 ${ORDER_STATUS_COLORS[order.status]}`}>
+            <span className={`badge text-sm sm:text-lg px-3 sm:px-4 py-1.5 sm:py-2 ${ORDER_STATUS_COLORS[order.status]}`}>
               {ORDER_STATUS_LABELS[order.status]}
             </span>
           </div>
@@ -147,10 +147,10 @@ const OrderDetail = () => {
 
         {/* Order Status Timeline */}
         {!isCancelled && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
             <h2 className="text-xl font-bold mb-6">Order Status</h2>
-            <div className="relative">
-              <div className="flex justify-between items-center">
+            <div className="relative overflow-x-auto">
+              <div className="flex justify-between items-center min-w-[640px]">
                 {getOrderStatusSteps().map((step, index) => {
                   const Icon = step.icon;
                   return (
@@ -231,7 +231,7 @@ const OrderDetail = () => {
           {/* Left Column - Main Details */}
           <div className="md:col-span-2 space-y-6">
             {/* Restaurant Info */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
               <h2 className="text-xl font-bold mb-4">Restaurant Details</h2>
               <Link
                 to={`/restaurant/${order.restaurantId._id}`}
@@ -256,17 +256,17 @@ const OrderDetail = () => {
             </div>
 
             {/* Order Items */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
               <h2 className="text-xl font-bold mb-4">Order Items</h2>
               <div className="space-y-4">
                 {order.items.map((item, index) => (
-                  <div key={index} className="flex items-center border-b pb-4 last:border-b-0 last:pb-0">
+                  <div key={index} className="flex items-center border-b pb-4 last:border-b-0 last:pb-0 gap-3">
                     <img
                       src={item.image || 'https://via.placeholder.com/60'}
                       alt={item.name}
                       className="w-16 h-16 rounded-lg object-cover"
                     />
-                    <div className="ml-4 flex-1">
+                    <div className="flex-1 min-w-0">
                       <h4 className="font-semibold">{item.name}</h4>
                       <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                       <p className="text-sm text-gray-600">{formatCurrency(item.price)} each</p>
@@ -280,7 +280,7 @@ const OrderDetail = () => {
             </div>
 
             {/* Delivery Address */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
               <h2 className="text-xl font-bold mb-4">Delivery Address</h2>
               <div className="flex">
                 <MapPinIcon className="h-6 w-6 text-primary-600 mr-3 flex-shrink-0" />
@@ -322,7 +322,7 @@ const OrderDetail = () => {
           {/* Right Column - Summary */}
           <div className="space-y-6">
             {/* Payment & Bill Summary */}
-            <div className="bg-white rounded-lg shadow p-6 sticky top-24">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6 sticky top-20 md:top-24">
               <h2 className="text-xl font-bold mb-4">Bill Details</h2>
               
               <div className="space-y-3 mb-4 pb-4 border-b">

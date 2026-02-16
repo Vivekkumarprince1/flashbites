@@ -10,7 +10,7 @@ const RestaurantCard = ({ restaurant }) => {
       className="card overflow-hidden group"
     >
       {/* Image */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-44 sm:h-48 overflow-hidden">
         <img
           src={restaurant.image || 'https://via.placeholder.com/400x300'}
           alt={restaurant.name}
@@ -37,15 +37,15 @@ const RestaurantCard = ({ restaurant }) => {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-lg font-bold text-gray-900 mb-1">{restaurant.name}</h3>
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 line-clamp-1">{restaurant.name}</h3>
         
         {/* Cuisines */}
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-gray-600 mb-2 line-clamp-1">
           {restaurant.cuisines.join(', ')}
         </p>
 
         {/* Info Row */}
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
           {/* Rating */}
           <div className="flex items-center">
             <StarIcon className="h-4 w-4 text-yellow-400 mr-1" />
@@ -60,7 +60,7 @@ const RestaurantCard = ({ restaurant }) => {
           </div>
 
           {/* Delivery Fee */}
-          <div className="text-gray-600">
+          <div className="text-gray-600 text-xs sm:text-sm">
             {restaurant.deliveryFee === 0 ? (
               <span className="text-green-600 font-semibold">Free Delivery</span>
             ) : (
